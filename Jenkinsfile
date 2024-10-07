@@ -1,35 +1,42 @@
 pipeline {
-    agent any
-    triggers {
-        pollSCM '* * * * *'
+        agent any
+        
+        environment {
+            PRISMA_API_URL="https://api2.prismacloud.io"
+        }
+
+        triggers {
+            pollSCM '* * * * *'
+        }
+        
+        stages {
+            stage('Checkout') {
+              steps {
+                  git branch: 'master', url: 'https://github.com/samarthsudarshan/jenkins-101-test'
+                  stash includes: '**/*', name: 'source'
+              }
+            }
+            stage('Checkov') {
+                steps {
+                    withCredentials([string(credentialsId: 'PC_USER', variable: 'pc_user'),string(credentialsId: 'PC_PASSWORD', variable: 'pc_password')]) {
+                        script {
+                            docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
+                              unstash 'source'
+                              try {
+                                  sh 'checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml --bc-api-key ${pc_user}::${pc_password} --repo-id  samarthsudarshan/jenkins-101-test --branch main'
+                                  junit skipPublishingChecks: true, testResults: 'results.xml'
+                              } catch (err) {
+                                  junit skipPublishingChecks: true, testResults: 'results.xml'
+                                  throw err
+                              }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        options {
+            preserveStashes()
+            timestamps()
+        }
     }
-    stages {
-        stage('Build') {
-            steps {
-                echo "Building.."
-                sh '''
-                cd myapp
-                pip install -r requirements.txt
-                '''
-            }
-        }
-        stage('Test') {
-            steps {
-                echo "Testing.."
-                sh '''
-                cd myapp
-                python3 hello.py
-                python3 hello.py --name=Brad
-                '''
-            }
-        }
-        stage('Deliver') {
-            steps {
-                echo 'Deliver....'
-                sh '''
-                echo "doing delivery stuff.."
-                '''
-            }
-        }
-    }
-}
