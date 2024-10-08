@@ -15,6 +15,11 @@ pipeline {
             stage('Checkov') {
                 agent { label 'master' }
                 steps {
+                    sh 'echo "Hello World"'
+                    sh '''
+                        echo "Multiline shell steps works too"
+                        ls -lah
+                    '''
                     withCredentials([string(credentialsId: 'PC_USER', variable: 'pc_user'),string(credentialsId: 'PC_PASSWORD', variable: 'pc_password')]) {
                         script {
                             docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
