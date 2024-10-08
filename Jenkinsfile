@@ -4,10 +4,6 @@ pipeline {
         environment {
             PRISMA_API_URL="https://api2.prismacloud.io"
         }
-
-        triggers {
-            pollSCM '* * * * *'
-        }
         
         stages {
             stage('Checkout') {
