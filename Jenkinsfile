@@ -13,6 +13,7 @@ pipeline {
               }
             }
             stage('Checkov') {
+                agent { label 'master' }
                 steps {
                     sh 'docker inspect --help'
                     withCredentials([string(credentialsId: 'PC_USER', variable: 'pc_user'),string(credentialsId: 'PC_PASSWORD', variable: 'pc_password')]) {
