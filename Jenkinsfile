@@ -14,6 +14,7 @@ pipeline {
             }
             stage('Checkov') {
                 steps {
+                    sh 'docker --help'
                     withCredentials([string(credentialsId: 'PC_USER', variable: 'pc_user'),string(credentialsId: 'PC_PASSWORD', variable: 'pc_password')]) {
                         script {
                             docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
