@@ -17,6 +17,7 @@ pipeline {
                 steps {
                     sh 'echo "Hello World"'
                     sh '''
+                        #!/bin/bash
                         echo "Multiline shell steps works too"
                         which docker
                     '''
@@ -25,7 +26,8 @@ pipeline {
                             docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
                               unstash 'source'
                               try {
-                                  sh 'checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml --bc-api-key ${pc_user}::${pc_password} --repo-id  samarthsudarshan/jenkins-101-test --branch master'
+                                  sh '''#!/bin/bash
+                                  checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml --bc-api-key ${pc_user}::${pc_password} --repo-id  samarthsudarshan/jenkins-101-test --branch master'''
                                   junit skipPublishingChecks: true, testResults: 'results.xml'
                               } catch (err) {
                                   junit skipPublishingChecks: true, testResults: 'results.xml'
