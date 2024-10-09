@@ -17,7 +17,7 @@ pipeline {
                 steps {
                     sh 'echo "Hello World"'
                     sh '''
-                        #!/bin/bash
+                        source ~/.zshrc
                         echo "Multiline shell steps works too"
                         which docker
                     '''
