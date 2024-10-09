@@ -17,17 +17,15 @@ pipeline {
                 steps {
                     sh 'echo "Hello World"'
                     sh '''
-                        source ~/.zshrc
                         echo "Multiline shell steps works too"
-                        which docker
+                        docker
                     '''
                     withCredentials([string(credentialsId: 'PC_USER', variable: 'pc_user'),string(credentialsId: 'PC_PASSWORD', variable: 'pc_password')]) {
                         script {
                             docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
                               unstash 'source'
                               try {
-                                  sh '''#!/bin/bash
-                                  checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml --bc-api-key ${pc_user}::${pc_password} --repo-id  samarthsudarshan/jenkins-101-test --branch master'''
+                                  sh 'checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml --bc-api-key ${pc_user}::${pc_password} --repo-id  samarthsudarshan/jenkins-101-test --branch master'
                                   junit skipPublishingChecks: true, testResults: 'results.xml'
                               } catch (err) {
                                   junit skipPublishingChecks: true, testResults: 'results.xml'
