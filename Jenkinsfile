@@ -13,7 +13,6 @@ pipeline {
               }
             }
             stage('Checkov') {
-                agent { label 'master' }
                 steps {
                     sh 'echo "hello"'
                     sh 'docker inspect --help'
